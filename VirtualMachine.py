@@ -7,12 +7,15 @@ lock = Lock()
 
 
 class VirtualMachine:
-    def __init__(self, machine_id, status: MachineStatus):
+    vm_id = 1
+
+    def __init__(self, status: MachineStatus = MachineStatus.WAITING):
         self.status = status
-        self.machine_id = machine_id
+        self.machine_id = VirtualMachine.vm_id
+        VirtualMachine.vm_id += 1
 
     def execute_task(self, task: Task, quantum: int):
-        print(f"Machine {self.machine_id}: Executing task {task.task_id}...")
+        print(f"Machine {self.machine_id}: Executing task {task.task_id}... (Pipeline {task.pipeline_id})")
         if task.task_duration < quantum:
             duration = task.task_duration
             task.task_duration = 0
@@ -20,8 +23,9 @@ class VirtualMachine:
         else:
             task.task_duration -= quantum
             duration = quantum
-        time.sleep(duration)
-        print(f"Machine {self.machine_id}: Done executing task {task.task_id} for {duration} seconds")
+        time.sleep(duration / 10)
+        print(
+            f"Machine {self.machine_id}: Done executing task {task.task_id} for {duration} seconds (remaning duration: {task.task_duration})")
         self.change_status(MachineStatus.WAITING)
         return task
 
