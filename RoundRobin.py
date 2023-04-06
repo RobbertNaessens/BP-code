@@ -1,6 +1,7 @@
 import concurrent.futures
 
 from VirtualMachine import *
+from Pipeline import *
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
@@ -12,31 +13,43 @@ def sort_function(task: Task):
     return task.priority
 
 
+def sort_function_for_flows(task: Task):
+    return task.sequential_flow
+
+
+def split_tasks_based_on_sequential_flow(pipeline_tasks):
+    result = []
+    saved_flows = set()
+    temp_list = []
+    pipeline_tasks = list(sorted(pipeline_tasks, key=sort_function_for_flows))
+    for task in pipeline_tasks:
+        flow = task.sequential_flow
+        if flow not in saved_flows:
+            saved_flows.add(flow)
+            result.append(temp_list)
+            temp_list = [task]
+        else:
+            temp_list.append(task)
+    result.append(temp_list)
+    return result
+
+
 class RoundRobin:
-    def __init__(self, machines: list[VirtualMachine], tasks: list[Task], quantum: int):
-        self.tasks = tasks
+    def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline], quantum: int):
+        self.pipelines = pipelines
         self.quantum = quantum
         self.machines = machines
+
         self.pool = ThreadPoolExecutor(max_workers=len(machines))
+        self.tasks = []
+        self.pipeline_dict = dict()
+        for pipeline in self.pipelines:
+            self.pipeline_dict[f"{pipeline.pipeline_id}"] = split_tasks_based_on_sequential_flow(pipeline.tasks)
+            self.tasks.extend(pipeline.tasks)
 
         self.running_futures = []
-        self.splitted_tasks = self.split_tasks_based_on_sequential_flow()
+        self.splitted_tasks = split_tasks_based_on_sequential_flow(self.tasks)
         self.subtask_list = []
-
-    def split_tasks_based_on_sequential_flow(self):
-        result = []
-        saved_flows = set()
-        temp_list = []
-        for task in self.tasks:
-            flow = task.sequential_flow
-            if flow not in saved_flows:
-                saved_flows.add(flow)
-                result.append(temp_list)
-                temp_list = [task]
-            else:
-                temp_list.append(task)
-        result.append(temp_list)
-        return result
 
     def select_machine(self):
         while True:
@@ -81,7 +94,6 @@ class RoundRobin:
                 concurrent.futures.wait(self.running_futures)
                 self.running_futures = []
             self.splitted_tasks.pop(0)
-
 
     def return_task_to_the_splitted_queue(self, future):
         task = future.result()

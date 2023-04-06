@@ -9,6 +9,8 @@ lock = Lock()
 class VirtualMachine:
     vm_id = 1
 
+    # TODO: Hardware simuleren. Zeker voor Most-fit algo is dit belangrijk
+
     def __init__(self, status: MachineStatus = MachineStatus.WAITING):
         self.status = status
         self.machine_id = VirtualMachine.vm_id

@@ -34,11 +34,11 @@ if __name__ == '__main__':
     p1_task21 = Task(0.6, sequential_flow=6, description="Analyze tables")
 
     # Tasks for pipeline2
-    p2_task1 = Task(0.1, sequential_flow=1, description="Clear cache")
+    p2_task22 = Task(0.1, sequential_flow=1, description="Clear cache")
 
-    p2_task2 = Task(33.5, sequential_flow=2, description="Run data set compressions")
+    p2_task23 = Task(33.5, sequential_flow=2, description="Run data set compressions")
 
-    p2_task3 = Task(1.0, sequential_flow=3, description="Fill data set models cache")
+    p2_task24 = Task(1.0, sequential_flow=3, description="Fill data set models cache")
     # endregion
 
     p1_tasks = [p1_task1, p1_task2, p1_task3, p1_task4, p1_task5, p1_task6, p1_task7, p1_task8, p1_task9,
@@ -46,15 +46,18 @@ if __name__ == '__main__':
                 p1_task19, p1_task20, p1_task21]
     pipeline1 = Pipeline(p1_tasks, "Process finance data")
 
-    p2_tasks = [p2_task1, p2_task2, p2_task3]
+    p2_tasks = [p2_task22, p2_task23, p2_task24]
     pipeline2 = Pipeline(p2_tasks, "Run data set compression")
+
+    pipelines = [pipeline1, pipeline2]
 
     time_quantum = 5
 
+    # TODO: Hardware simuleren voor de VM's
     m1 = VirtualMachine()
     m2 = VirtualMachine()
     m3 = VirtualMachine()
     machines = [m1, m2, m3]
 
-    RR = RoundRobin(machines, pipeline1.tasks, time_quantum)
+    RR = RoundRobin(machines, pipelines, time_quantum)
     RR.execute2()
