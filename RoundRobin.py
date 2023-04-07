@@ -5,6 +5,7 @@ from Pipeline import *
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
+import time
 
 lock = Lock()
 
@@ -43,13 +44,13 @@ class RoundRobin:
         self.pool = ThreadPoolExecutor(max_workers=len(machines))
         self.tasks = []
         self.pipeline_dict = dict()
-        for pipeline in self.pipelines:
-            self.pipeline_dict[f"{pipeline.pipeline_id}"] = split_tasks_based_on_sequential_flow(pipeline.tasks)
-            self.tasks.extend(pipeline.tasks)
+        self.split_tasks_based_on_pipeline()
 
         self.running_futures = []
         self.splitted_tasks = split_tasks_based_on_sequential_flow(self.tasks)
         self.subtask_list = []
+
+        self.start_time = time.time()
 
     def select_machine(self):
         while True:
@@ -58,26 +59,13 @@ class RoundRobin:
                 return available_machines[0]
 
     def execute_task_on_machine(self, selected_machine, current_task):
-        return selected_machine.execute_task(current_task, self.quantum)
+        return selected_machine.execute_task(current_task, self.quantum, time.time() - self.start_time)
 
-    def return_task_to_the_queue(self, future):
-        task = future.result()
-        if task.task_duration > 0:
-            self.tasks.append(task)
-
-    def execute(self):
-        while len(self.tasks) > 0:
-            while len(self.tasks) > 0:
-                self.tasks = deque(sorted(self.tasks, key=sort_function, reverse=True))
-                current_task = self.tasks.popleft()
-                selected_machine = self.select_machine()
-                selected_machine.change_status(MachineStatus.RUNNING)
-                future = self.pool.submit(self.execute_task_on_machine, selected_machine, current_task)
-                future.add_done_callback(self.return_task_to_the_queue)
-                self.running_futures.append(future)
-            concurrent.futures.wait(self.running_futures)
-            self.running_futures = []
-        # print("Round Robin executed")
+    def split_tasks_based_on_pipeline(self):
+        for pipeline in self.pipelines:
+            self.pipeline_dict[f"{pipeline.pipeline_id}"] = {
+                "Tasks": split_tasks_based_on_sequential_flow(pipeline.tasks), "Current_flow": 0}
+            self.tasks.extend(pipeline.tasks)
 
     def execute2(self):
         while len(self.splitted_tasks) > 0:
@@ -94,8 +82,30 @@ class RoundRobin:
                 concurrent.futures.wait(self.running_futures)
                 self.running_futures = []
             self.splitted_tasks.pop(0)
+        total_time = time.time() - self.start_time
+        print(f"Machines Idle-time: {list(map(lambda m: total_time - m.working_time, self.machines))}; Total duration: {total_time}")
 
     def return_task_to_the_splitted_queue(self, future):
         task = future.result()
         if task.task_duration > 0:
             self.subtask_list.append(task)
+
+    def search_next_task(self):
+        sorted_pipelines = list(sorted(self.pipelines, key=lambda p: p.priority, reverse=True))
+        sorted_pipelines_ids = list(map(lambda p: p.pipeline_id, sorted_pipelines))
+        pipeline_looper = 0
+        while True:
+            selected_id = sorted_pipelines_ids[pipeline_looper]
+            pipeline_looper = (pipeline_looper + 1) % len(sorted_pipelines_ids)
+            selected_pipeline = self.pipeline_dict[str(selected_id)]
+            if len(selected_pipeline["Tasks"][0]) < 1:
+                selected_pipeline["Tasks"].pop(0)
+                selected_pipeline["Current_flow"] += 1
+            elif selected_pipeline["Tasks"][0][0].sequential_flow == selected_pipeline["Current_flow"]:
+                return selected_pipeline["Tasks"][0].pop(0)
+
+    def pipeline_sort_function(self, pipeline):
+        return pipeline.priority
+
+    def execute3(self):
+        pass

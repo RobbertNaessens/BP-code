@@ -16,7 +16,9 @@ class VirtualMachine:
         self.machine_id = VirtualMachine.vm_id
         VirtualMachine.vm_id += 1
 
-    def execute_task(self, task: Task, quantum: int):
+        self.working_time = 0
+
+    def execute_task(self, task: Task, quantum: int, current_time):
         print(f"Machine {self.machine_id}: Executing task {task.task_id}... (Pipeline {task.pipeline_id})")
         if task.task_duration < quantum:
             duration = task.task_duration
@@ -25,10 +27,12 @@ class VirtualMachine:
         else:
             task.task_duration -= quantum
             duration = quantum
-        time.sleep(duration / 10)
+        time.sleep(duration)
+        self.working_time += duration
         print(
             f"Machine {self.machine_id}: Done executing task {task.task_id} for {duration} seconds (remaning duration: {task.task_duration})")
         self.change_status(MachineStatus.WAITING)
+
         return task
 
     def change_status(self, status):
