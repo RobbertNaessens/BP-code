@@ -18,7 +18,7 @@ class VirtualMachine:
 
         self.working_time = 0
 
-    def execute_task(self, task: Task, quantum: int, current_time):
+    def execute_task(self, task: Task, quantum: int):
         print(f"Machine {self.machine_id}: Executing task {task.task_id}... (Pipeline {task.pipeline_id})")
         if task.task_duration < quantum:
             duration = task.task_duration

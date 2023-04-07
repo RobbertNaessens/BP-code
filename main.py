@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     pipelines = [pipeline1, pipeline2]
 
-    time_quantum = 5
+    time_quantum = 10
 
     # TODO: Hardware simuleren voor de VM's
     m1 = VirtualMachine()

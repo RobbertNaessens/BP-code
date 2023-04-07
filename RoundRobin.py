@@ -59,7 +59,7 @@ class RoundRobin:
                 return available_machines[0]
 
     def execute_task_on_machine(self, selected_machine, current_task):
-        return selected_machine.execute_task(current_task, self.quantum, time.time() - self.start_time)
+        return selected_machine.execute_task(current_task, self.quantum)
 
     def split_tasks_based_on_pipeline(self):
         for pipeline in self.pipelines:
