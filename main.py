@@ -39,6 +39,43 @@ if __name__ == '__main__':
     p2_task23 = Task(33.5, sequential_flow=2, description="Run data set compressions")
 
     p2_task24 = Task(1.0, sequential_flow=3, description="Fill data set models cache")
+
+    # Tasks for pipeline3
+    p3_task25 = Task(12, sequential_flow=1, description="Clear cache")
+
+    p3_task26 = Task(24, sequential_flow=2, description="Run data set compressions")
+    p3_task27 = Task(12, sequential_flow=2, description="Run data set compressions")
+
+    p3_task28 = Task(5.0, sequential_flow=3, description="Fill data set models cache")
+
+    # Tasks for pipeline4
+    p4_task29 = Task(115, sequential_flow=1, description="Process finance data")
+    p4_task30 = Task(30.9, sequential_flow=1, description="Process finance data")
+
+    p4_task31 = Task(17.5, sequential_flow=2, description="P&L x Transaction Lines")
+    p4_task32 = Task(21.3, sequential_flow=2, description="B/S x Transaction Lines")
+    p4_task33 = Task(5.2, sequential_flow=2, description="GL Account")
+    p4_task34 = Task(7.9, sequential_flow=2, description="Budget Cost Center")
+
+    p4_task35 = Task(1.1, sequential_flow=3, description="postings")
+    p4_task36 = Task(2.6, sequential_flow=3, description="transaction_lines")
+    p4_task37 = Task(0.2, sequential_flow=3, description="accounts")
+
+    p4_task38 = Task(12.9, sequential_flow=4, description="Transaction Lines (Postings)")
+    p4_task39 = Task(27.4, sequential_flow=4, description="Transaction Lines (Postings)")
+    p4_task40 = Task(6.3, sequential_flow=4, description="Transaction Lines (Postings)")
+    p4_task41 = Task(17.4, sequential_flow=4, description="Transaction Lines (Postings)")
+    p4_task42 = Task(4.2, sequential_flow=4, description="Transaction Lines (Postings)")
+
+    p4_task43 = Task(0.4, sequential_flow=5, description="Create cluster table")
+    p4_task44 = Task(1.6, sequential_flow=5, description="Create cluster table")
+    p4_task45 = Task(4.2, sequential_flow=5, description="Create cluster table")
+    p4_task46 = Task(6.4, sequential_flow=5, description="Create cluster table")
+    p4_task47 = Task(17.2, sequential_flow=5, description="Create cluster table")
+    p4_task48 = Task(0.4, sequential_flow=5, description="Create cluster table")
+
+    p4_task49 = Task(0.55, sequential_flow=6, description="Analyze tables")
+
     # endregion
 
     p1_tasks = [p1_task1, p1_task2, p1_task3, p1_task4, p1_task5, p1_task6, p1_task7, p1_task8, p1_task9,
@@ -49,16 +86,26 @@ if __name__ == '__main__':
     p2_tasks = [p2_task22, p2_task23, p2_task24]
     pipeline2 = Pipeline(p2_tasks, "Run data set compression")
 
-    pipelines = [pipeline1, pipeline2]
+    p3_tasks = [p3_task25, p3_task26, p3_task27, p3_task28]
+    pipeline3 = Pipeline(p3_tasks, "Run data set compression", 5)
+
+    p4_tasks = [p4_task29, p4_task30, p4_task31, p4_task32, p4_task33, p4_task34, p4_task35, p4_task36, p4_task37,
+                p4_task38, p4_task39, p4_task40, p4_task41, p4_task42, p4_task43, p4_task44, p4_task45, p4_task46,
+                p4_task47, p4_task48, p4_task49]
+    pipeline4 = Pipeline(p4_tasks, "Process finance data")
+
+    pipelines = [pipeline1, pipeline2, pipeline3, pipeline4]
 
     time_quantum = 10
 
-    # TODO: Hardware simuleren voor de VM's
     m1 = VirtualMachine()
     m2 = VirtualMachine()
     m3 = VirtualMachine()
     machines = [m1, m2, m3]
 
     RR = RoundRobin(machines, pipelines, time_quantum)
-    RR.execute2()
+    # RR.execute_RR()
+    RR.execute_RR_better()
 
+    # RR.execute3(): Machines Idle-time: [3.7628149509429996, 3.9228149509429997, 11.73781495094299]; Total duration: 31.312814950942993
+    # RR.execute2(): Machines Idle-time: [2.2345353794097917, 10.66953537940979, 17.024535379409787]; Total duration: 34.81453537940979

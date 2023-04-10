@@ -9,10 +9,9 @@ lock = Lock()
 class VirtualMachine:
     vm_id = 1
 
-    # TODO: Hardware simuleren. Zeker voor Most-fit algo is dit belangrijk
-
-    def __init__(self, status: MachineStatus = MachineStatus.WAITING):
+    def __init__(self, status: MachineStatus = MachineStatus.WAITING, clock_speed=2.6):
         self.status = status
+        self.clock_speed = clock_speed
         self.machine_id = VirtualMachine.vm_id
         VirtualMachine.vm_id += 1
 
@@ -27,10 +26,10 @@ class VirtualMachine:
         else:
             task.task_duration -= quantum
             duration = quantum
-        time.sleep(duration)
-        self.working_time += duration
+        time.sleep(duration/10)
+        self.working_time += duration/10
         print(
-            f"Machine {self.machine_id}: Done executing task {task.task_id} for {duration} seconds (remaning duration: {task.task_duration})")
+            f"Machine {self.machine_id}: Done executing task {task.task_id} for {duration} seconds (remaning duration: {task.task_duration} seconds)")
         self.change_status(MachineStatus.WAITING)
 
         return task
