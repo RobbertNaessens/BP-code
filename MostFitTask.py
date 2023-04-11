@@ -8,15 +8,14 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 import time
 
-lock = Lock()
 
-
-def sort_function(task: Task):
-    return task.priority
-
-
-def sort_function_for_flows(task: Task):
-    return task.sequential_flow
+def calculate_fitness(machine: VirtualMachine, task: Task):
+    # We calculate the fitness of a given task and machine
+    # To do this, we use the formula provided in the paper
+    expected_execution_time = task.workload / machine.clock_speed
+    diff = abs(expected_execution_time - task.task_duration)
+    fitness = 10000 / (1 + diff)
+    return fitness
 
 
 def split_tasks_based_on_sequential_flow(pipeline_tasks):
@@ -36,14 +35,13 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
     return result
 
 
-def pipeline_sort_function(pipeline):
-    return pipeline.priority
+def sort_function_for_flows(task: Task):
+    return task.sequential_flow
 
 
-class RoundRobin:
-    def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline], quantum: int):
+class MostFitTask:
+    def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline]):
         self.pipelines = pipelines
-        self.quantum = quantum
         self.machines = machines
 
         self.pool = ThreadPoolExecutor(max_workers=len(machines))
@@ -51,20 +49,18 @@ class RoundRobin:
         self.pipeline_dict = dict()
         self.split_tasks_based_on_pipeline()
 
-        self.running_futures = []
-        self.splitted_tasks = split_tasks_based_on_sequential_flow(self.tasks)
-        self.subtask_list = []
-
         self.start_time = time.time()
 
-    def select_machine(self):
+    def select_machine(self, task: Task):
         while True:
             available_machines = list(filter(lambda m: m.status == MachineStatus.WAITING, self.machines))
             if len(available_machines) > 0:
-                return available_machines[0]
+                fitness_values = list(calculate_fitness(machine, task) for machine in available_machines)
+                selected_machine_id = fitness_values.index(max(fitness_values))
+                return available_machines[selected_machine_id]
 
     def execute_task_on_machine(self, selected_machine, current_task):
-        return selected_machine.execute_task_RR(current_task, self.quantum)
+        return selected_machine.execute_task_MFTF(current_task)
 
     def split_tasks_based_on_pipeline(self):
         for pipeline in self.pipelines:
@@ -74,30 +70,6 @@ class RoundRobin:
                 "amount_of_tasks": list(map(lambda t: len(t), splitted_tasks)),
                 "finished": False}
             self.tasks.extend(pipeline.tasks)
-
-    def execute_RR(self):
-        while len(self.splitted_tasks) > 0:
-            self.subtask_list = self.splitted_tasks[0]
-            while len(self.subtask_list) > 0:
-                while len(self.subtask_list) > 0:
-                    self.subtask_list = deque(sorted(self.subtask_list, key=sort_function, reverse=True))
-                    current_task = self.subtask_list.popleft()
-                    selected_machine = self.select_machine()
-                    selected_machine.change_status(MachineStatus.RUNNING)
-                    future = self.pool.submit(self.execute_task_on_machine, selected_machine, current_task)
-                    future.add_done_callback(self.return_task_to_the_splitted_queue)
-                    self.running_futures.append(future)
-                concurrent.futures.wait(self.running_futures)
-                self.running_futures = []
-            self.splitted_tasks.pop(0)
-        total_time = time.time() - self.start_time
-        print(
-            f"Machines Idle-time: {list(map(lambda m: total_time - m.working_time, self.machines))}; Total duration: {total_time}")
-
-    def return_task_to_the_splitted_queue(self, future):
-        task = future.result()
-        if task.task_duration > 0:
-            self.subtask_list.append(task)
 
     def search_next_task(self):
         sorted_pipelines = list(sorted(self.pipelines, key=lambda p: p.priority, reverse=True))
@@ -145,10 +117,10 @@ class RoundRobin:
                 pipeline_looper = (pipeline_looper + 1) % len(sorted_pipelines_ids)
         return None, 0
 
-    def execute_RR_better(self):
+    def execute_MFT(self):
         selected_task, pipeline_id = self.search_next_task()
         while selected_task is not None:
-            selected_machine = self.select_machine()
+            selected_machine = self.select_machine(selected_task)
             selected_machine.change_status(MachineStatus.RUNNING)
             future = self.pool.submit(self.execute_task_on_machine, selected_machine, selected_task)
             future.add_done_callback(
@@ -176,4 +148,3 @@ class RoundRobin:
             print(f"Machine {machine.machine_id} idle time: {total_time - machine.working_time} seconds")
             result_dict["machines"][machine.machine_id] = total_time - machine.working_time
         print(f"Total duration: {total_time} seconds")
-

@@ -1,4 +1,5 @@
 from RoundRobin import *
+from MostFitTask import *
 from VirtualMachine import *
 from Task import *
 from Pipeline import *
@@ -96,16 +97,24 @@ if __name__ == '__main__':
 
     pipelines = [pipeline1, pipeline2, pipeline3, pipeline4]
 
-    time_quantum = 10
-
-    m1 = VirtualMachine()
-    m2 = VirtualMachine()
-    m3 = VirtualMachine()
+    m1 = VirtualMachine(clock_speed=3.2)
+    m2 = VirtualMachine(clock_speed=4.1)
+    m3 = VirtualMachine(clock_speed=5.7)
     machines = [m1, m2, m3]
 
-    RR = RoundRobin(machines, pipelines, time_quantum)
+    # region Execution of Round Robin
+    time_quantum = 10
+
+    # RR = RoundRobin(machines, pipelines, time_quantum)
     # RR.execute_RR()
-    RR.execute_RR_better()
+    # RR.execute_RR_better()
 
     # RR.execute3(): Machines Idle-time: [3.7628149509429996, 3.9228149509429997, 11.73781495094299]; Total duration: 31.312814950942993
     # RR.execute2(): Machines Idle-time: [2.2345353794097917, 10.66953537940979, 17.024535379409787]; Total duration: 34.81453537940979
+
+    # endregion
+
+    # region Execution of Most Fit Task
+    MFT = MostFitTask(machines, pipelines)
+    MFT.execute_MFT()
+    # endregion
