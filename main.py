@@ -3,8 +3,10 @@ from MostFitTask import *
 from VirtualMachine import *
 from Task import *
 from Pipeline import *
+import csv
 
-if __name__ == '__main__':
+
+def create_pipelines():
     # region Declaring tasks for pipelines
     # Tasks for pipeline1
     p1_task1 = Task(180, sequential_flow=1, description="Process finance data")
@@ -88,7 +90,7 @@ if __name__ == '__main__':
     pipeline2 = Pipeline(p2_tasks, "Run data set compression")
 
     p3_tasks = [p3_task25, p3_task26, p3_task27, p3_task28]
-    pipeline3 = Pipeline(p3_tasks, "Run data set compression", 5)
+    pipeline3 = Pipeline(p3_tasks, "Run data set compression")
 
     p4_tasks = [p4_task29, p4_task30, p4_task31, p4_task32, p4_task33, p4_task34, p4_task35, p4_task36, p4_task37,
                 p4_task38, p4_task39, p4_task40, p4_task41, p4_task42, p4_task43, p4_task44, p4_task45, p4_task46,
@@ -97,24 +99,54 @@ if __name__ == '__main__':
 
     pipelines = [pipeline1, pipeline2, pipeline3, pipeline4]
 
+    return pipelines
+
+
+def create_VMs():
     m1 = VirtualMachine(clock_speed=3.2)
     m2 = VirtualMachine(clock_speed=4.1)
     m3 = VirtualMachine(clock_speed=5.7)
     machines = [m1, m2, m3]
 
+    return machines
+
+
+def execute_Round_Robin():
+    pipelines = create_pipelines()
+    machines = create_VMs()
+
     # region Execution of Round Robin
     time_quantum = 10
 
-    # RR = RoundRobin(machines, pipelines, time_quantum)
+    RR = RoundRobin(machines, pipelines, time_quantum)
     # RR.execute_RR()
-    # RR.execute_RR_better()
+    result = RR.execute_RR_better()
+    with open("./results_RR.csv", "a", newline="") as f2:
+        writer2 = csv.writer(f2)
+        row = []
+        row.extend(result["pipelines"].values())
+        row.extend(result["machines"].values())
+        row.append(result["total_duration"])
 
-    # RR.execute3(): Machines Idle-time: [3.7628149509429996, 3.9228149509429997, 11.73781495094299]; Total duration: 31.312814950942993
-    # RR.execute2(): Machines Idle-time: [2.2345353794097917, 10.66953537940979, 17.024535379409787]; Total duration: 34.81453537940979
-
+        writer2.writerow(row)
     # endregion
+
+
+def execute_Most_Fit_Task():
+    pipelines = create_pipelines()
+    machines = create_VMs()
 
     # region Execution of Most Fit Task
     MFT = MostFitTask(machines, pipelines)
     MFT.execute_MFT()
     # endregion
+
+
+if __name__ == '__main__':
+    with open("./results_RR.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
+                  "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
+        writer.writerow(header)
+    for i in range(1, 5):
+        execute_Round_Robin()

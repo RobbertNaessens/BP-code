@@ -155,7 +155,7 @@ class RoundRobin:
                 functools.partial(self.return_task_to_the_pipeline_queue, pipeline_id))
             with lock:
                 selected_task, pipeline_id = self.search_next_task()
-        self.get_results()
+        return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
         task = future.result()
@@ -176,4 +176,5 @@ class RoundRobin:
             print(f"Machine {machine.machine_id} idle time: {total_time - machine.working_time} seconds")
             result_dict["machines"][machine.machine_id] = total_time - machine.working_time
         print(f"Total duration: {total_time} seconds")
+        return result_dict
 

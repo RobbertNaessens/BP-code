@@ -107,6 +107,7 @@ class MostFitTask:
 
                 # In het ander geval is een taak beschikbaar
                 else:
+                    # remaining_tasks -= 1
                     return selected_pipeline["tasks"][0].pop(0), selected_id
             else:
                 # Geen taken meer op deze pipeline
