@@ -148,5 +148,5 @@ if __name__ == '__main__':
         header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
                   "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
         writer.writerow(header)
-    for i in range(1, 5):
+    for i in range(1, 101):
         execute_Round_Robin()

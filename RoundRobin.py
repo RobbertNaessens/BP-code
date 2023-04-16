@@ -36,10 +36,6 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
     return result
 
 
-def pipeline_sort_function(pipeline):
-    return pipeline.priority
-
-
 class RoundRobin:
     def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline], quantum: int):
         self.pipelines = pipelines
