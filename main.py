@@ -121,7 +121,7 @@ def execute_Round_Robin():
     RR = RoundRobin(machines, pipelines, time_quantum)
     # RR.execute_RR()
     result = RR.execute_RR_better()
-    with open("./results_RR.csv", "a", newline="") as f2:
+    with open("./results_RR2.csv", "a", newline="") as f2:
         writer2 = csv.writer(f2)
         row = []
         row.extend(result["pipelines"].values())
@@ -143,7 +143,7 @@ def execute_Most_Fit_Task():
 
 
 if __name__ == '__main__':
-    with open("./results_RR.csv", "w", newline="") as f:
+    with open("./results_RR2.csv", "w", newline="") as f:
         writer = csv.writer(f)
         header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
                   "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
