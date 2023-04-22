@@ -68,7 +68,7 @@ class RoundRobin:
             self.pipeline_dict[f"{pipeline.pipeline_id}"] = {
                 "tasks": splitted_tasks, "current_flow": 0,
                 "amount_of_tasks": list(map(lambda t: len(t), splitted_tasks)),
-                "finished": False}
+                "finished": False, "total_task_counter": len(pipeline.tasks)}
             self.tasks.extend(pipeline.tasks)
 
     def execute_RR(self):
@@ -89,11 +89,18 @@ class RoundRobin:
         total_time = time.time() - self.start_time
         print(
             f"Machines Idle-time: {list(map(lambda m: total_time - m.working_time, self.machines))}; Total duration: {total_time}")
+        return self.get_results()
 
     def return_task_to_the_splitted_queue(self, future):
         task = future.result()
         if task.task_duration > 0:
             self.subtask_list.append(task)
+        else:
+            pipeline = self.pipeline_dict[str(task.pipeline_id)]
+            pipeline["total_task_counter"] -= 1
+            if pipeline["total_task_counter"] == 0 and not pipeline["finished"]:
+                pipeline["finished"] = True
+                pipeline["completion_time"] = time.time() - self.start_time
 
     def search_next_task(self):
         sorted_pipelines = list(sorted(self.pipelines, key=lambda p: p.priority, reverse=True))
@@ -173,4 +180,3 @@ class RoundRobin:
             result_dict["machines"][machine.machine_id] = total_time - machine.working_time
         print(f"Total duration: {total_time} seconds")
         return result_dict
-
