@@ -14,11 +14,17 @@ class Task:
         self.description = description
 
         self.pipeline_id = 0
+        self.pipeline = None
         self.workload = self.simulate_workload()
 
     def simulate_workload(self):
         # This function will be used while executing the MFT algorithm
         return self.task_duration * round(random.uniform(2, 5), 2) * round(random.uniform(0.8, 1.2), 2)
+
+    def set_pipeline(self, pipeline):
+        self.pipeline = pipeline
+        self.pipeline_id = pipeline.pipeline_id
+        self.priority = pipeline.priority
 
     def __str__(self):
         return f"Task {self.task_id} with priority {self.priority} has {self.task_duration} seconds remaining."

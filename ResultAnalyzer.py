@@ -52,32 +52,75 @@ def show_combined_results():
     df_pipelines_better = df2.iloc[:, list(range(4)) + [-2] + [-1]]
     df_machines_better = df2.iloc[:, list(range(4, 7)) + [-1]]
 
-    # Combine the 2 dataframes for both pipelines and machines
-    whole_pipelines = pd.concat([df_pipelines_worse, df_pipelines_better], ignore_index=True)
-    whole_machines = pd.concat([df_machines_worse, df_machines_better], ignore_index=True)
+    # Transform pipelines
+    pipelines = pd.DataFrame()
 
-    fig, ax = plt.subplots(1, 1, figsize=(8, 4))
-    sns.barplot(data=df_pipelines_better)
-    sns.barplot(data=df_pipelines_worse)
+    # Worse results
+    for i in range(1, 5):
+        df = transform_result(df_pipelines_worse, f"Pipeline{i}", "Execute_RR")
+        pipelines = pd.concat([pipelines, df])
 
-    # Plot the pipelines
-    sns.barplot(data=whole_pipelines)
+    total = transform_result(df_pipelines_worse, "Total", "Execute_RR")
+    pipelines = pd.concat([pipelines, total])
+
+    # Better results
+    for i in range(1, 5):
+        df = transform_result(df_pipelines_better, f"Pipeline{i}", "Execute_RR_better")
+        pipelines = pd.concat([pipelines, df])
+
+    total = transform_result(df_pipelines_better, "Total", "Execute_RR_better")
+    pipelines = pd.concat([pipelines, total])
+
+    # Show the plot
+    sns.barplot(data=pipelines, y="Execution time", x="Pipeline", hue="Type")
+
     plt.xlabel("Pipelines")
     plt.ylabel("Execution time (s)")
-    plt.title("Comparison Worse vs Better")
+    plt.title("Comparison of function results execute_RR and execute_RR_better")
+
+    plt.ylim(0, 360)
+    plt.legend(loc='upper left')
     plt.show()
 
-    # Plot the machines
-    sns.barplot(data=whole_machines)
+    # ----------------------------
+    # Now do the same for the machines
+    # ----------------------------
+
+    # Transform pipelines
+    machines = pd.DataFrame()
+
+    # Worse results
+    for i in range(1, 4):
+        df = transform_result(df_machines_worse, f"Machine{i}-Idle", "Execute_RR", True)
+        machines = pd.concat([machines, df])
+
+    # Better results
+    for i in range(1, 4):
+        df = transform_result(df_machines_better, f"Machine{i}-Idle", "Execute_RR_better", True)
+        machines = pd.concat([machines, df])
+
+    sns.barplot(data=machines, y="Idle time", x="Machine", hue="Type")
+
     plt.xlabel("Machines")
     plt.ylabel("Idle time (s)")
-    plt.title("Comparison Worse vs Better")
+    plt.title("Comparison of function results execute_RR and execute_RR_better")
+
+    plt.ylim(0, 180)
     plt.show()
 
-    df = sns.load_dataset("penguins")
-    print(df)
+
+def transform_result(total_df, index_df, function, machine=False):
+    temp = pd.DataFrame()
+    if not machine:
+        temp["Execution time"] = total_df[index_df]
+        temp["Pipeline"] = index_df
+    else:
+        temp["Idle time"] = total_df[index_df]
+        temp["Machine"] = index_df
+    temp["Type"] = function
+    return temp
 
 
-show_individual_results("results_RR_worse.csv", "Results execute_RR")
-show_individual_results("results_RR2.csv", "Results execute_RR_better")
-# show_combined_results()
+# show_individual_results("results_RR_worse.csv", "Results execute_RR")
+# show_individual_results("results_RR2.csv", "Results execute_RR_better")
+show_combined_results()

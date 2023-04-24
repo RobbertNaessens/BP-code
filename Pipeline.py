@@ -12,9 +12,5 @@ class Pipeline:
         self.description = description
         self.priority = priority
 
-        self.assign_pipeline_id_to_tasks()
-
-    def assign_pipeline_id_to_tasks(self):
         for task in self.tasks:
-            task.pipeline_id = self.pipeline_id
-            task.priority = self.priority
+            task.set_pipeline(self)
