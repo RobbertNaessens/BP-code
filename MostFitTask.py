@@ -104,10 +104,10 @@ class MostFitTask:
                 elif len(selected_pipeline["tasks"]) > 0 and len(selected_pipeline["tasks"][0]) == 0:
                     # Switch naar een andere pipeline
                     pipeline_looper = (pipeline_looper + 1) % len(sorted_pipelines_ids)
+                    # print(f"Searching for task on other pipeline: {pipeline_looper}")
 
                 # In het ander geval is een taak beschikbaar
                 else:
-                    # remaining_tasks -= 1
                     return selected_pipeline["tasks"][0].pop(0), selected_id
             else:
                 # Geen taken meer op deze pipeline
@@ -128,7 +128,10 @@ class MostFitTask:
                 functools.partial(self.return_task_to_the_pipeline_queue, pipeline_id))
             with lock:
                 selected_task, pipeline_id = self.search_next_task()
-        self.get_results()
+
+        # Free resources
+        self.pool.shutdown()
+        return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
         task = future.result()

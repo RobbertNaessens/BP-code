@@ -178,4 +178,4 @@ if __name__ == '__main__':
     # for i in range(1, 101):
     #     execute_Round_Robin_worse()
 
-    execute_Round_Robin()
+    execute_Most_Fit_Task()

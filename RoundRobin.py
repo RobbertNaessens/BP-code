@@ -89,6 +89,9 @@ class RoundRobin:
         total_time = time.time() - self.start_time
         print(
             f"Machines Idle-time: {list(map(lambda m: total_time - m.working_time, self.machines))}; Total duration: {total_time}")
+
+        # Free resources
+        self.pool.shutdown()
         return self.get_results()
 
     def return_task_to_the_splitted_queue(self, future):
@@ -158,6 +161,9 @@ class RoundRobin:
                 functools.partial(self.return_task_to_the_pipeline_queue, pipeline_id))
             with lock:
                 selected_task, pipeline_id = self.search_next_task()
+
+        # Free resources
+        self.pool.shutdown()
         return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
