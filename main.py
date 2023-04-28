@@ -198,12 +198,12 @@ if __name__ == '__main__':
     #     execute_Round_Robin_worse()
 
     # execute_Round_Robin()
-    # execute_Most_Fit_Task()
+    execute_Most_Fit_Task()
 
-    with open("./results_Dumb.csv", "w", newline="") as f:
-        writer = csv.writer(f)
-        header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
-                  "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
-        writer.writerow(header)
-    for i in range(1, 2):
-        execute_Dumb_Algorithm()
+    # with open("./results_Dumb.csv", "w", newline="") as f:
+    #     writer = csv.writer(f)
+    #     header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
+    #               "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
+    #     writer.writerow(header)
+    # for i in range(1, 2):
+    #     execute_Dumb_Algorithm()

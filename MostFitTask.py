@@ -8,6 +8,8 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 import time
 
+lock = Lock()
+
 
 def calculate_fitness(machine: VirtualMachine, task: Task):
     # We calculate the fitness of a given task and machine
@@ -142,7 +144,6 @@ class MostFitTask:
             self.pipeline_dict[str(pipeline_id)]["tasks"][0].append(task)
         else:
             self.pipeline_dict[str(pipeline_id)]["amount_of_tasks"][0] -= 1
-            print(f'CALLBACK: pipeline_id: {pipeline_id}')
 
     def get_results(self):
         print("\n############################################################\n")
