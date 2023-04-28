@@ -3,6 +3,7 @@ from MostFitTask import *
 from VirtualMachine import *
 from Task import *
 from Pipeline import *
+from DumbAlgorithm import *
 import csv
 
 
@@ -120,14 +121,14 @@ def execute_Round_Robin():
 
     RR = RoundRobin(machines, pipelines, time_quantum)
     result = RR.execute_RR_better()
-    with open("./results_RR2.csv", "a", newline="") as f2:
-        writer2 = csv.writer(f2)
-        row = []
-        row.extend(result["pipelines"].values())
-        row.extend(result["machines"].values())
-        row.append(result["total_duration"])
-
-        writer2.writerow(row)
+    # with open("./results_RR2.csv", "a", newline="") as f2:
+    #     writer2 = csv.writer(f2)
+    #     row = []
+    #     row.extend(result["pipelines"].values())
+    #     row.extend(result["machines"].values())
+    #     row.append(result["total_duration"])
+    #
+    #     writer2.writerow(row)
     # endregion
 
 
@@ -140,14 +141,14 @@ def execute_Round_Robin_worse():
 
     RR = RoundRobin(machines, pipelines, time_quantum)
     result = RR.execute_RR()
-    with open("./results_RR_worse.csv", "a", newline="") as f2:
-        writer2 = csv.writer(f2)
-        row = []
-        row.extend(result["pipelines"].values())
-        row.extend(result["machines"].values())
-        row.append(result["total_duration"])
-
-        writer2.writerow(row)
+    # with open("./results_RR_worse.csv", "a", newline="") as f2:
+    #     writer2 = csv.writer(f2)
+    #     row = []
+    #     row.extend(result["pipelines"].values())
+    #     row.extend(result["machines"].values())
+    #     row.append(result["total_duration"])
+    #
+    #     writer2.writerow(row)
     # endregion
 
 
@@ -158,6 +159,24 @@ def execute_Most_Fit_Task():
     # region Execution of Most Fit Task
     MFT = MostFitTask(machines, pipelines)
     MFT.execute_MFT()
+    # endregion
+
+
+def execute_Dumb_Algorithm():
+    pipelines = create_pipelines()
+    machines = create_VMs()
+
+    # region Execution of Dumb Algorithm
+    dumb_algo = DumbAlgorithm(machines, pipelines)
+    result = dumb_algo.execute()
+    with open("./results_Dumb.csv", "a", newline="") as f2:
+        writer2 = csv.writer(f2)
+        row = []
+        row.extend(result["pipelines"].values())
+        row.extend(result["machines"].values())
+        row.append(result["total_duration"])
+
+        writer2.writerow(row)
     # endregion
 
 
@@ -178,4 +197,13 @@ if __name__ == '__main__':
     # for i in range(1, 101):
     #     execute_Round_Robin_worse()
 
-    execute_Most_Fit_Task()
+    # execute_Round_Robin()
+    # execute_Most_Fit_Task()
+
+    with open("./results_Dumb.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
+                  "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
+        writer.writerow(header)
+    for i in range(1, 2):
+        execute_Dumb_Algorithm()

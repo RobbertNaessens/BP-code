@@ -36,7 +36,7 @@ class VirtualMachine:
 
     def execute_task_MFTF(self, task: Task):
         print(f"Machine {self.machine_id}: Executing task {task.task_id}... (Pipeline {task.pipeline_id}, flow {task.sequential_flow})")
-        duration = task.task_duration / 100
+        duration = task.task_duration
         task.task_duration = 0
         time.sleep(duration)
         self.working_time += duration
@@ -46,6 +46,10 @@ class VirtualMachine:
         self.change_status(MachineStatus.WAITING)
 
         return task
+
+    def execute_task_Dumb(self, task):
+        result_task = self.execute_task_MFTF(task)
+        return result_task
 
     def change_status(self, status):
         with lock:

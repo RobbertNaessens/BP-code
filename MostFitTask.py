@@ -59,7 +59,7 @@ class MostFitTask:
                 selected_machine_id = fitness_values.index(max(fitness_values))
                 return available_machines[selected_machine_id]
 
-    def execute_task_on_machine(self, selected_machine, current_task):
+    def execute_task_on_machine(self, selected_machine: VirtualMachine, current_task):
         return selected_machine.execute_task_MFTF(current_task)
 
     def split_tasks_based_on_pipeline(self):
@@ -104,7 +104,6 @@ class MostFitTask:
                 elif len(selected_pipeline["tasks"]) > 0 and len(selected_pipeline["tasks"][0]) == 0:
                     # Switch naar een andere pipeline
                     pipeline_looper = (pipeline_looper + 1) % len(sorted_pipelines_ids)
-                    # print(f"Searching for task on other pipeline: {pipeline_looper}")
 
                 # In het ander geval is een taak beschikbaar
                 else:
@@ -134,12 +133,16 @@ class MostFitTask:
         return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
+        print("CALLBACK")
         task = future.result()
+        # In MFT, the tasks will always be executed fully, so this is
+        # just a safety measure
         if task.task_duration > 0:
             # Append the task to the right pipeline
             self.pipeline_dict[str(pipeline_id)]["tasks"][0].append(task)
         else:
             self.pipeline_dict[str(pipeline_id)]["amount_of_tasks"][0] -= 1
+            print(f'CALLBACK: pipeline_id: {pipeline_id}')
 
     def get_results(self):
         print("\n############################################################\n")

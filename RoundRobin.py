@@ -167,6 +167,7 @@ class RoundRobin:
         return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
+        print("CALLBACK")
         task = future.result()
         if task.task_duration > 0:
             # Append the task to the right pipeline
