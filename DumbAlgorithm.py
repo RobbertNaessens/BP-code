@@ -1,19 +1,9 @@
-from collections import deque
-import concurrent.futures
 import functools
 
 from VirtualMachine import *
 from Pipeline import *
-from concurrent.futures import ThreadPoolExecutor
+from AbstractAlgorithm import *
 import time
-
-
-def sort_function_for_flows(task: Task):
-    return task.sequential_flow
-
-
-def sort_function(task: Task):
-    return task.priority
 
 
 def split_tasks_based_on_sequential_flow(pipeline_tasks):
@@ -33,12 +23,9 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
     return result
 
 
-class DumbAlgorithm:
+class DumbAlgorithm(AbstractAlgorithm):
     def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline]):
-        self.pipelines = pipelines
-        self.machines = machines
-
-        self.pool = ThreadPoolExecutor(max_workers=len(machines))
+        super().__init__(machines, pipelines)
         self.tasks = []
         self.pipeline_dict = dict()
         self.split_tasks_based_on_pipeline()
@@ -46,8 +33,6 @@ class DumbAlgorithm:
         self.running_futures = []
         self.splitted_tasks = split_tasks_based_on_sequential_flow(self.tasks)
         self.subtask_list = []
-
-        self.start_time = time.time()
 
     def split_tasks_based_on_pipeline(self):
         for pipeline in list(sorted(self.pipelines, key=lambda p: p.priority, reverse=True)):
@@ -83,7 +68,7 @@ class DumbAlgorithm:
                 # in dit geval is de lengte vd array = 0
                 elif len(selected_pipeline["tasks"]) > 0 and len(selected_pipeline["tasks"][0]) == 0:
                     # Hier even wachten en later opnieuw proberen
-                    time.sleep(0.1)
+                    time.sleep(0.01)
                 # In het ander geval is een taak beschikbaar
                 else:
                     available_task = selected_pipeline["tasks"][0].pop(0)
@@ -105,7 +90,6 @@ class DumbAlgorithm:
         return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
-        print("CALLBACK")
         task = future.result()
         if task.task_duration > 0:
             # Append the task to the right pipeline

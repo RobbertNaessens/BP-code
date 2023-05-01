@@ -3,6 +3,7 @@ import functools
 
 from VirtualMachine import *
 from Pipeline import *
+from AbstractAlgorithm import *
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
@@ -41,19 +42,16 @@ def sort_function_for_flows(task: Task):
     return task.sequential_flow
 
 
-class MostFitTask:
+class MostFitTask(AbstractAlgorithm):
     def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline]):
-        self.pipelines = pipelines
-        self.machines = machines
-
-        self.pool = ThreadPoolExecutor(max_workers=len(machines))
+        super().__init__(machines, pipelines)
         self.tasks = []
         self.pipeline_dict = dict()
         self.split_tasks_based_on_pipeline()
+        self.selected_task = None
 
-        self.start_time = time.time()
-
-    def select_machine(self, task: Task):
+    def select_machine(self):
+        task = self.selected_task
         while True:
             available_machines = list(filter(lambda m: m.status == MachineStatus.WAITING, self.machines))
             if len(available_machines) > 0:
@@ -119,10 +117,11 @@ class MostFitTask:
                 pipeline_looper = (pipeline_looper + 1) % len(sorted_pipelines_ids)
         return None, 0
 
-    def execute_MFT(self):
+    def execute(self):
         selected_task, pipeline_id = self.search_next_task()
         while selected_task is not None:
-            selected_machine = self.select_machine(selected_task)
+            self.selected_task = selected_task
+            selected_machine = self.select_machine()
             selected_machine.change_status(MachineStatus.RUNNING)
             future = self.pool.submit(self.execute_task_on_machine, selected_machine, selected_task)
             future.add_done_callback(
@@ -135,7 +134,6 @@ class MostFitTask:
         return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
-        print("CALLBACK")
         task = future.result()
         # In MFT, the tasks will always be executed fully, so this is
         # just a safety measure

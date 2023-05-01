@@ -121,7 +121,7 @@ def execute_Round_Robin():
 
     RR = RoundRobin(machines, pipelines, time_quantum)
     result = RR.execute_RR_better()
-    # with open("./results_RR2.csv", "a", newline="") as f2:
+    # with open("Results/results_RR2.csv", "a", newline="") as f2:
     #     writer2 = csv.writer(f2)
     #     row = []
     #     row.extend(result["pipelines"].values())
@@ -141,7 +141,7 @@ def execute_Round_Robin_worse():
 
     RR = RoundRobin(machines, pipelines, time_quantum)
     result = RR.execute_RR()
-    # with open("./results_RR_worse.csv", "a", newline="") as f2:
+    # with open("Results/results_RR_worse.csv", "a", newline="") as f2:
     #     writer2 = csv.writer(f2)
     #     row = []
     #     row.extend(result["pipelines"].values())
@@ -169,7 +169,7 @@ def execute_Dumb_Algorithm():
     # region Execution of Dumb Algorithm
     dumb_algo = DumbAlgorithm(machines, pipelines)
     result = dumb_algo.execute()
-    with open("./results_Dumb.csv", "a", newline="") as f2:
+    with open("Results/results_Dumb.csv", "a", newline="") as f2:
         writer2 = csv.writer(f2)
         row = []
         row.extend(result["pipelines"].values())
@@ -181,7 +181,7 @@ def execute_Dumb_Algorithm():
 
 
 if __name__ == '__main__':
-    # with open("./results_RR2.csv", "w", newline="") as f:
+    # with open("Results/results_RR2.csv", "w", newline="") as f:
     #     writer = csv.writer(f)
     #     header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
     #               "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     # for i in range(1, 101):
     #     execute_Round_Robin()
 
-    # with open("./results_RR_worse.csv", "w", newline="") as f:
+    # with open("Results/results_RR_worse.csv", "w", newline="") as f:
     #     writer = csv.writer(f)
     #     header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
     #               "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
@@ -198,12 +198,12 @@ if __name__ == '__main__':
     #     execute_Round_Robin_worse()
 
     # execute_Round_Robin()
-    execute_Most_Fit_Task()
+    # execute_Most_Fit_Task()
 
-    # with open("./results_Dumb.csv", "w", newline="") as f:
-    #     writer = csv.writer(f)
-    #     header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
-    #               "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
-    #     writer.writerow(header)
-    # for i in range(1, 2):
-    #     execute_Dumb_Algorithm()
+    with open("Results/results_Dumb.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
+                  "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
+        writer.writerow(header)
+    for i in range(1, 101):
+        execute_Dumb_Algorithm()

@@ -33,7 +33,7 @@ def show_individual_results(file, title):
 
 
 def show_combined_results():
-    result_worse = pd.read_csv("results_RR_worse.csv")
+    result_worse = pd.read_csv("Results/results_RR_worse.csv")
     df = pd.DataFrame(result_worse)
     # Transform the dataframe a bit
     # Add a column to the dataframe to indicate the result type
@@ -43,7 +43,7 @@ def show_combined_results():
     df_machines_worse = df.iloc[:, list(range(4, 7)) + [-1]]
 
     # Repeat the same steps for the other file
-    result_better = pd.read_csv("results_RR2.csv")
+    result_better = pd.read_csv("Results/results_RR2.csv")
     df2 = pd.DataFrame(result_better)
     # Transform the dataframe a bit
     # Add a column to the dataframe to indicate the result type

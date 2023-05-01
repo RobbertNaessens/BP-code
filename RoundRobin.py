@@ -3,20 +3,13 @@ import functools
 
 from VirtualMachine import *
 from Pipeline import *
+from AbstractAlgorithm import *
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 import time
 
 lock = Lock()
-
-
-def sort_function(task: Task):
-    return task.priority
-
-
-def sort_function_for_flows(task: Task):
-    return task.sequential_flow
 
 
 def split_tasks_based_on_sequential_flow(pipeline_tasks):
@@ -36,13 +29,11 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
     return result
 
 
-class RoundRobin:
+class RoundRobin(AbstractAlgorithm):
     def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline], quantum: int):
-        self.pipelines = pipelines
+        super().__init__(machines, pipelines)
         self.quantum = quantum
-        self.machines = machines
 
-        self.pool = ThreadPoolExecutor(max_workers=len(machines))
         self.tasks = []
         self.pipeline_dict = dict()
         self.split_tasks_based_on_pipeline()
@@ -50,8 +41,6 @@ class RoundRobin:
         self.running_futures = []
         self.splitted_tasks = split_tasks_based_on_sequential_flow(self.tasks)
         self.subtask_list = []
-
-        self.start_time = time.time()
 
     def select_machine(self):
         while True:
@@ -166,8 +155,10 @@ class RoundRobin:
         self.pool.shutdown()
         return self.get_results()
 
+    def execute(self):
+        return self.execute_RR_better()
+
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
-        print("CALLBACK")
         task = future.result()
         if task.task_duration > 0:
             # Append the task to the right pipeline
