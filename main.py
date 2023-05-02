@@ -158,7 +158,15 @@ def execute_Most_Fit_Task():
 
     # region Execution of Most Fit Task
     MFT = MostFitTask(machines, pipelines)
-    MFT.execute_MFT()
+    result = MFT.execute()
+    with open("Results/results_MFT.csv", "a", newline="") as f2:
+        writer2 = csv.writer(f2)
+        row = []
+        row.extend(result["pipelines"].values())
+        row.extend(result["machines"].values())
+        row.append(result["total_duration"])
+
+        writer2.writerow(row)
     # endregion
 
 
@@ -200,10 +208,18 @@ if __name__ == '__main__':
     # execute_Round_Robin()
     # execute_Most_Fit_Task()
 
-    with open("Results/results_Dumb.csv", "w", newline="") as f:
+    # with open("Results/results_Dumb.csv", "w", newline="") as f:
+    #     writer = csv.writer(f)
+    #     header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
+    #               "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
+    #     writer.writerow(header)
+    # for i in range(1, 101):
+    #     execute_Dumb_Algorithm()
+
+    with open("Results/results_MFT.csv", "w", newline="") as f:
         writer = csv.writer(f)
         header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
                   "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
         writer.writerow(header)
     for i in range(1, 101):
-        execute_Dumb_Algorithm()
+        execute_Most_Fit_Task()

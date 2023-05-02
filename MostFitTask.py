@@ -154,3 +154,4 @@ class MostFitTask(AbstractAlgorithm):
             print(f"Machine {machine.machine_id} idle time: {total_time - machine.working_time} seconds")
             result_dict["machines"][machine.machine_id] = total_time - machine.working_time
         print(f"Total duration: {total_time} seconds")
+        return result_dict
