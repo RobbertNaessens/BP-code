@@ -216,10 +216,12 @@ if __name__ == '__main__':
     # for i in range(1, 101):
     #     execute_Dumb_Algorithm()
 
-    with open("Results/results_MFT.csv", "w", newline="") as f:
-        writer = csv.writer(f)
-        header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
-                  "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
-        writer.writerow(header)
-    for i in range(1, 101):
-        execute_Most_Fit_Task()
+    # with open("Results/results_MFT.csv", "w", newline="") as f:
+    #     writer = csv.writer(f)
+    #     header = ["Pipeline1", "Pipeline2", "Pipeline3", "Pipeline4",
+    #               "Machine1-Idle", "Machine2-Idle", "Machine3-Idle", "Total"]
+    #     writer.writerow(header)
+    # for i in range(1, 101):
+    #     execute_Most_Fit_Task()
+    execute_Round_Robin()
+
