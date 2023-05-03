@@ -1,11 +1,5 @@
-import concurrent.futures
 import functools
-
-from VirtualMachine import *
-from Pipeline import *
 from AbstractAlgorithm import *
-from collections import deque
-from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 import time
 
@@ -36,10 +30,6 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
             temp_list.append(task)
     result.append(temp_list)
     return result
-
-
-def sort_function_for_flows(task: Task):
-    return task.sequential_flow
 
 
 class MostFitTask(AbstractAlgorithm):
