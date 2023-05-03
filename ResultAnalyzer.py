@@ -19,7 +19,7 @@ def show_individual_results(file, title):
     plt.title(title)
 
     # Plot the same y-axis
-    plt.ylim(0, 360)
+    # plt.ylim(0, 360)
     plt.show()
 
     # Plot the machines
@@ -28,84 +28,7 @@ def show_individual_results(file, title):
     plt.ylabel("Idle time (s)")
     plt.title(title)
 
-    plt.ylim(0, 180)
-    plt.show()
-
-
-def show_combined_results():
-    result_worse = pd.read_csv("Results/results_RR_worse.csv")
-    df = pd.DataFrame(result_worse)
-    # Transform the dataframe a bit
-    # Add a column to the dataframe to indicate the result type
-    df["Type"] = "Worse"
-
-    df_pipelines_worse = df.iloc[:, list(range(4)) + [-2] + [-1]]
-    df_machines_worse = df.iloc[:, list(range(4, 7)) + [-1]]
-
-    # Repeat the same steps for the other file
-    result_better = pd.read_csv("Results/results_RR2.csv")
-    df2 = pd.DataFrame(result_better)
-    # Transform the dataframe a bit
-    # Add a column to the dataframe to indicate the result type
-    df2["Type"] = "Better"
-
-    df_pipelines_better = df2.iloc[:, list(range(4)) + [-2] + [-1]]
-    df_machines_better = df2.iloc[:, list(range(4, 7)) + [-1]]
-
-    # Transform pipelines
-    pipelines = pd.DataFrame()
-
-    # Worse results
-    for i in range(1, 5):
-        df = transform_result(df_pipelines_worse, f"Pipeline{i}", "Execute_RR")
-        pipelines = pd.concat([pipelines, df])
-
-    total = transform_result(df_pipelines_worse, "Total", "Execute_RR")
-    pipelines = pd.concat([pipelines, total])
-
-    # Better results
-    for i in range(1, 5):
-        df = transform_result(df_pipelines_better, f"Pipeline{i}", "Execute_RR_better")
-        pipelines = pd.concat([pipelines, df])
-
-    total = transform_result(df_pipelines_better, "Total", "Execute_RR_better")
-    pipelines = pd.concat([pipelines, total])
-
-    # Show the plot
-    sns.barplot(data=pipelines, y="Execution time", x="Pipeline", hue="Type")
-
-    plt.xlabel("Pipelines")
-    plt.ylabel("Execution time (s)")
-    plt.title("Comparison of function results execute_RR and execute_RR_better")
-
-    plt.ylim(0, 360)
-    plt.legend(loc='upper left')
-    plt.show()
-
-    # ----------------------------
-    # Now do the same for the machines
-    # ----------------------------
-
-    # Transform pipelines
-    machines = pd.DataFrame()
-
-    # Worse results
-    for i in range(1, 4):
-        df = transform_result(df_machines_worse, f"Machine{i}-Idle", "Execute_RR", True)
-        machines = pd.concat([machines, df])
-
-    # Better results
-    for i in range(1, 4):
-        df = transform_result(df_machines_better, f"Machine{i}-Idle", "Execute_RR_better", True)
-        machines = pd.concat([machines, df])
-
-    sns.barplot(data=machines, y="Idle time", x="Machine", hue="Type")
-
-    plt.xlabel("Machines")
-    plt.ylabel("Idle time (s)")
-    plt.title("Comparison of function results execute_RR and execute_RR_better")
-
-    plt.ylim(0, 180)
+    # plt.ylim(0, 180)
     plt.show()
 
 
@@ -121,6 +44,86 @@ def transform_result(total_df, index_df, function, machine=False):
     return temp
 
 
-# show_individual_results("results_RR_worse.csv", "Results execute_RR")
-# show_individual_results("results_RR2.csv", "Results execute_RR_better")
-show_combined_results()
+def show_all_combined_results(files, types):
+    df_all_pipelines = pd.DataFrame()
+    df_all_machines = pd.DataFrame()
+    for looper in range(len(files)):
+        result = pd.read_csv(files[looper])
+        df = pd.DataFrame(result)
+        # Transform the dataframe a bit
+        # Add a column to the dataframe to indicate the result type
+        df["Type"] = types[looper]
+
+        df_pipelines = df.iloc[:, list(range(4)) + [-2] + [-1]]
+        df_machines = df.iloc[:, list(range(4, 7)) + [-1]]
+
+        # Transform pipelines
+        pipelines = pd.DataFrame()
+
+        # Worse results
+        for i in range(1, 5):
+            df = transform_result(df_pipelines, f"Pipeline{i}", types[looper])
+            pipelines = pd.concat([pipelines, df])
+
+        total = transform_result(df_pipelines, "Total", types[looper])
+        pipelines = pd.concat([pipelines, total])
+
+        # Add the pipelines_df to the global one
+        df_all_pipelines = pd.concat([df_all_pipelines, pipelines])
+
+        # ----------------------------
+        # Now do the same for the machines
+        # ----------------------------
+
+        # Transform pipelines
+        machines = pd.DataFrame()
+
+        # Worse results
+        for i in range(1, 4):
+            df = transform_result(df_machines, f"Machine{i}-Idle", types[looper], True)
+            machines = pd.concat([machines, df])
+
+        df_all_machines = pd.concat([df_all_machines, machines])
+
+    # Show the plot
+    sns.barplot(data=df_all_pipelines, y="Execution time", x="Pipeline", hue="Type")
+
+    plt.xlabel("Pipelines")
+    plt.ylabel("Execution time (s)")
+    plt.title("Comparison of algorithms")
+
+    # plt.ylim(0, 360)
+    plt.legend(loc='upper left')
+    plt.show()
+
+    sns.barplot(data=df_all_machines, y="Idle time", x="Machine", hue="Type")
+
+    plt.xlabel("Machines")
+    plt.ylabel("Idle time (s)")
+    plt.title("Comparison of algorithms")
+
+    # plt.ylim(0, 180)
+    plt.show()
+
+
+file_RR_worse = "Results/results_RR_worse.csv"
+file_RR = "Results/results_RR2.csv"
+file_MFT = "Results/results_MFT.csv"
+file_Dumb = "Results/results_Dumb.csv"
+
+# Dom algoritme
+show_individual_results(file_Dumb, "Results dumb algorithm")
+
+# Round Robin algoritmen
+show_individual_results(file_RR_worse, "Results execute_RR")
+show_individual_results(file_RR, "Results execute_RR_better")
+show_all_combined_results([file_RR_worse, file_RR], ["Round Robin Worse", "Round Robin Better"])
+
+# MFT algoritme
+show_individual_results(file_MFT, "Results MFT algorithm")
+
+# Gecombineerde resultaten
+show_all_combined_results([file_Dumb, file_RR, file_MFT], ["Dumb", "Round Robin", "Most Fit Task"])
+show_all_combined_results([file_Dumb, file_RR_worse, file_RR, file_MFT],
+                          ["Dumb", "Round Robin Worse", "Round Robin Better", "Most Fit Task"])
+show_all_combined_results([file_RR, file_MFT], ["Round Robin", "Most Fit Task"])
