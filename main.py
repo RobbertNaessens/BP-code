@@ -6,8 +6,31 @@ from Pipeline import *
 from DumbAlgorithm import *
 import csv
 
+""" Algorithm executor
+
+This script executes a number of algorithms with a number of tasks and a number of pipelines. 
+In order to be able to process the tasks and the pipelines, there are a few generated virtual machines.
+
+The results are collected and written out to different CSV-files. 
+
+The ResultAnalyzer script can be used to process the outputs of this script in graphs by using the Pandas library
+
+The script uses the following methods:
+    - create_pipelines: creates a few tasks and collect them in a number of pipelines
+    - create_VMs: creates a number of virtual machines with a given clock speed
+    - execute_Round_Robin: Executes the round robin algorithm
+    - execute_Round_Robin_Worse: Executes the round robin algorithm, but in a worse way
+    - execute_Most_Fit_Task: Executes the most fit task algorithm
+    - execute_Dumb_Algorithm: Executes the dumb algorithm
+
+"""
+
 
 def create_pipelines():
+    """
+    Creates a small number of tasks and assigns them to a number of pipelines
+    :return: List[Pipeline]
+    """
     # region Declaring tasks for pipelines
     # Tasks for pipeline1
     p1_task1 = Task(180, sequential_flow=1, description="Process finance data")
@@ -104,6 +127,10 @@ def create_pipelines():
 
 
 def create_VMs():
+    """
+    Creates a number of machines and returns them
+    :return: List[VirtualMachine]
+    """
     m1 = VirtualMachine(clock_speed=3.2)
     m2 = VirtualMachine(clock_speed=4.1)
     m3 = VirtualMachine(clock_speed=5.7)
@@ -113,6 +140,11 @@ def create_VMs():
 
 
 def execute_Round_Robin():
+    """
+    Executes the Round Robin algorithm with a number of pipelines and machines
+
+    The results are written to a CSV-file
+    """
     pipelines = create_pipelines()
     machines = create_VMs()
 
@@ -121,18 +153,23 @@ def execute_Round_Robin():
 
     RR = RoundRobin(machines, pipelines, time_quantum)
     result = RR.execute_RR_better()
-    # with open("Results/results_RR2.csv", "a", newline="") as f2:
-    #     writer2 = csv.writer(f2)
-    #     row = []
-    #     row.extend(result["pipelines"].values())
-    #     row.extend(result["machines"].values())
-    #     row.append(result["total_duration"])
-    #
-    #     writer2.writerow(row)
+    with open("Results/results_RR2.csv", "a", newline="") as f2:
+        writer2 = csv.writer(f2)
+        row = []
+        row.extend(result["pipelines"].values())
+        row.extend(result["machines"].values())
+        row.append(result["total_duration"])
+
+        writer2.writerow(row)
     # endregion
 
 
 def execute_Round_Robin_worse():
+    """
+    Executes the Round Robin algorithm in a worse way with a number of pipelines and machines
+
+    The results are written to a CSV-file
+    """
     pipelines = create_pipelines()
     machines = create_VMs()
 
@@ -141,18 +178,23 @@ def execute_Round_Robin_worse():
 
     RR = RoundRobin(machines, pipelines, time_quantum)
     result = RR.execute_RR()
-    # with open("Results/results_RR_worse.csv", "a", newline="") as f2:
-    #     writer2 = csv.writer(f2)
-    #     row = []
-    #     row.extend(result["pipelines"].values())
-    #     row.extend(result["machines"].values())
-    #     row.append(result["total_duration"])
-    #
-    #     writer2.writerow(row)
+    with open("Results/results_RR_worse.csv", "a", newline="") as f2:
+        writer2 = csv.writer(f2)
+        row = []
+        row.extend(result["pipelines"].values())
+        row.extend(result["machines"].values())
+        row.append(result["total_duration"])
+
+        writer2.writerow(row)
     # endregion
 
 
 def execute_Most_Fit_Task():
+    """
+    Executes the Most Fit Task algorithm with a number of pipelines and machines
+
+    The results are written to a CSV-file
+    """
     pipelines = create_pipelines()
     machines = create_VMs()
 
@@ -171,6 +213,11 @@ def execute_Most_Fit_Task():
 
 
 def execute_Dumb_Algorithm():
+    """
+    Executes the Round Robin algorithm with a number of pipelines and machines
+
+    The results are written to a CSV-file
+    """
     pipelines = create_pipelines()
     machines = create_VMs()
 
@@ -223,5 +270,7 @@ if __name__ == '__main__':
     #     writer.writerow(header)
     # for i in range(1, 101):
     #     execute_Most_Fit_Task()
-    execute_Round_Robin()
+
+    algo = DumbAlgorithm(create_VMs(), create_pipelines())
+    algo.execute()
 

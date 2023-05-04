@@ -3,8 +3,26 @@ import matplotlib.pyplot as plt
 import matplotlib
 import seaborn as sns
 
+"""Result Analyzer
+
+This script analyzed the CSV-files produced by the different kind of algorithms. 
+
+It uses the Pandas and the Seaborn library to collect, transform and plot the data
+
+The script uses the following methods:
+    - show_individual_results(file, title): Shows a graph of a single CSV-file and gives it a certain title 
+    - transform_result(total_df, index_df, function, machine=False): Transforms a certain dataframe
+    - show_all_combined_results(files, types): PLots the results of different CSV-files on a single graph for comparison
+
+"""
+
 
 def show_individual_results(file, title):
+    """
+    Plots a graph of the results of a single CSV-file
+    :param file: str
+    :param title: str
+    """
     result = pd.read_csv(file)
     df = pd.DataFrame(result)
     # df.iloc is used for integer indexing
@@ -33,6 +51,13 @@ def show_individual_results(file, title):
 
 
 def transform_result(total_df, index_df, function, machine=False):
+    """
+    Makes a new dataframe based on an old dataframe and some columns
+    :param total_df: DataFrame
+    :param index_df: int
+    :param function: str
+    :param machine: bool (default is False)
+    """
     temp = pd.DataFrame()
     if not machine:
         temp["Execution time"] = total_df[index_df]
@@ -45,6 +70,11 @@ def transform_result(total_df, index_df, function, machine=False):
 
 
 def show_all_combined_results(files, types):
+    """
+    Plots the result of multiple files on a single graph for easy comparison between the results
+    :param files: List[str]
+    :param types: List[str]
+    """
     df_all_pipelines = pd.DataFrame()
     df_all_machines = pd.DataFrame()
     for looper in range(len(files)):
@@ -106,24 +136,31 @@ def show_all_combined_results(files, types):
     plt.show()
 
 
-file_RR_worse = "Results/results_RR_worse.csv"
-file_RR = "Results/results_RR2.csv"
-file_MFT = "Results/results_MFT.csv"
-file_Dumb = "Results/results_Dumb.csv"
+def main():
+    """
+    Main function. Combines the previous functions to plots the right graphs based on the output files.
+    """
+    file_RR_worse = "Results/results_RR_worse.csv"
+    file_RR = "Results/results_RR2.csv"
+    file_MFT = "Results/results_MFT.csv"
+    file_Dumb = "Results/results_Dumb.csv"
 
-# Dom algoritme
-show_individual_results(file_Dumb, "Results dumb algorithm")
+    # Dom algoritme
+    show_individual_results(file_Dumb, "Results dumb algorithm")
 
-# Round Robin algoritmen
-show_individual_results(file_RR_worse, "Results execute_RR")
-show_individual_results(file_RR, "Results execute_RR_better")
-show_all_combined_results([file_RR_worse, file_RR], ["Round Robin Worse", "Round Robin Better"])
+    # Round Robin algoritmen
+    show_individual_results(file_RR_worse, "Results execute_RR")
+    show_individual_results(file_RR, "Results execute_RR_better")
+    show_all_combined_results([file_RR_worse, file_RR], ["Round Robin Worse", "Round Robin Better"])
 
-# MFT algoritme
-show_individual_results(file_MFT, "Results MFT algorithm")
+    # MFT algoritme
+    show_individual_results(file_MFT, "Results MFT algorithm")
 
-# Gecombineerde resultaten
-show_all_combined_results([file_Dumb, file_RR, file_MFT], ["Dumb", "Round Robin", "Most Fit Task"])
-show_all_combined_results([file_Dumb, file_RR_worse, file_RR, file_MFT],
-                          ["Dumb", "Round Robin Worse", "Round Robin Better", "Most Fit Task"])
-show_all_combined_results([file_RR, file_MFT], ["Round Robin", "Most Fit Task"])
+    # Gecombineerde resultaten
+    show_all_combined_results([file_Dumb, file_RR, file_MFT], ["Dumb", "Round Robin", "Most Fit Task"])
+    show_all_combined_results([file_Dumb, file_RR_worse, file_RR, file_MFT],
+                              ["Dumb", "Round Robin Worse", "Round Robin Better", "Most Fit Task"])
+    show_all_combined_results([file_RR, file_MFT], ["Round Robin", "Most Fit Task"])
+
+
+main()

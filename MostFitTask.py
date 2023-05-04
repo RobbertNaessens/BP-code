@@ -7,6 +7,12 @@ lock = Lock()
 
 
 def calculate_fitness(machine: VirtualMachine, task: Task):
+    """
+    Calculates a certain score for a task and a virtual machine. This score is then used to determine what machine is the most fitted to execute the task. 
+    :param machine: VirtualMachine
+    :param task: Task
+    :return: float
+    """
     # We calculate the fitness of a given task and machine
     # To do this, we use the formula provided in the paper
     expected_execution_time = task.workload / machine.clock_speed
@@ -16,6 +22,13 @@ def calculate_fitness(machine: VirtualMachine, task: Task):
 
 
 def split_tasks_based_on_sequential_flow(pipeline_tasks):
+    """
+    Overrides AbstractAlgorithm.split_tasks_based_on_sequential_flow(pipeline_tasks)
+
+    Splits all the tasks based on their sequential flow
+    :param pipeline_tasks: List[Task]
+    :return: List[Task]
+    """
     result = []
     saved_flows = set()
     temp_list = []
@@ -33,7 +46,41 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
 
 
 class MostFitTask(AbstractAlgorithm):
+    """
+        A class that represents the Most Fit Task algorithm for scheduling by overwriting the abstract class AbstractAlgorithm.
+
+        Attributes
+        ----------
+        tasks : List[Task]
+            A sequence of tasks that needs to be executed
+        pipeline_dict : dict
+            A helper dictionary for gathering results per pipeline
+        selected_task : Task
+            Currently selected task for executing on a machine
+
+        Methods
+        -------
+        split_tasks_based_on_pipeline()
+            Makes a new dictionary with information about each pipeline
+        select_machine()
+            Returns a VirtualMachine for executing a task
+        execute_task_on_machine(selected_machine, current_task)
+            Executes the currently selected task on the selected machine and returns the task
+        execute()
+            Executes the Most Fit Task algorithm
+        return_task_to_the_pipeline_queue()
+            Checks if the task was successfully executed and places it back on the queue when necessary
+        get_results()
+            Gathers results after execution of the algorithm
+        search_next_task()
+            Searches for the next available task
+    """
     def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline]):
+        """
+        Constructs a MostFitTask object with a number of machines and pipelines
+        :param machines: List[VirtualMachine]
+        :param pipelines: List[Pipeline]
+        """
         super().__init__(machines, pipelines)
         self.tasks = []
         self.pipeline_dict = dict()
@@ -41,6 +88,10 @@ class MostFitTask(AbstractAlgorithm):
         self.selected_task = None
 
     def select_machine(self):
+        """
+        Returns an available VirtualMachine for executing a task based on the fitness value between the task and the machine
+        :return: VirtualMachine
+        """
         task = self.selected_task
         while True:
             available_machines = list(filter(lambda m: m.status == MachineStatus.WAITING, self.machines))
@@ -50,9 +101,19 @@ class MostFitTask(AbstractAlgorithm):
                 return available_machines[selected_machine_id]
 
     def execute_task_on_machine(self, selected_machine: VirtualMachine, current_task):
+        """
+        Executes the currently selected task on the selected machine and returns the task
+        :param selected_machine: VirtualMachine
+        :param current_task: Task
+        :return: Task
+        """
         return selected_machine.execute_task_MFTF(current_task)
 
     def split_tasks_based_on_pipeline(self):
+        """
+        Makes a new helper dictionary with information about each pipeline
+
+        """
         for pipeline in self.pipelines:
             splitted_tasks = split_tasks_based_on_sequential_flow(pipeline.tasks)
             self.pipeline_dict[f"{pipeline.pipeline_id}"] = {
@@ -62,6 +123,10 @@ class MostFitTask(AbstractAlgorithm):
             self.tasks.extend(pipeline.tasks)
 
     def search_next_task(self):
+        """
+        Searches for the next available task in the list. This function holds track of running tasks in other threads, the sequential flows of the pipelines and the priority of tasks and pipelines.
+        :return: tuple
+        """
         sorted_pipelines = list(sorted(self.pipelines, key=lambda p: p.priority, reverse=True))
         sorted_pipelines_ids = list(map(lambda p: p.pipeline_id, sorted_pipelines))
         pipeline_looper = 0
@@ -108,6 +173,10 @@ class MostFitTask(AbstractAlgorithm):
         return None, 0
 
     def execute(self):
+        """
+        Executes the Most Fit Task algorithm by looping over all the pipelines and tasks and executing a task on a virtual machine
+        :return: dict
+        """
         selected_task, pipeline_id = self.search_next_task()
         while selected_task is not None:
             self.selected_task = selected_task
@@ -124,6 +193,11 @@ class MostFitTask(AbstractAlgorithm):
         return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
+        """
+        Checks if the task in the future is fully completed. If not, the task is sent back to the queue of the right pipeline
+        :param pipeline_id: int
+        :param future: Future
+        """
         task = future.result()
         # In MFT, the tasks will always be executed fully, so this is
         # just a safety measure
@@ -134,6 +208,10 @@ class MostFitTask(AbstractAlgorithm):
             self.pipeline_dict[str(pipeline_id)]["amount_of_tasks"][0] -= 1
 
     def get_results(self):
+        """
+        Collects the results after execution from the pipeline_dict and returns them
+        :return: dict
+        """
         print("\n############################################################\n")
         total_time = time.time() - self.start_time
         result_dict = dict({"pipelines": dict(), "machines": dict(), "total_duration": total_time})

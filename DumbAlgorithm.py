@@ -7,6 +7,13 @@ import time
 
 
 def split_tasks_based_on_sequential_flow(pipeline_tasks):
+    """
+    Overrides AbstractAlgorithm.split_tasks_based_on_sequential_flow(pipeline_tasks)
+
+    Splits all the tasks based on their sequential flow
+    :param pipeline_tasks: List[Task]
+    :return: List[Task]
+    """
     result = []
     saved_flows = set()
     temp_list = []
@@ -24,17 +31,50 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
 
 
 class DumbAlgorithm(AbstractAlgorithm):
+    """
+    A class that represents a dumb algorithm for scheduling by overwriting the abstract class AbstractAlgorithm.
+
+    This would be the current representation of the situation at BrightAnalytics.
+
+    Attributes
+    ----------
+    tasks : List[Task]
+        A sequence of tasks that needs to be executed
+    pipeline_dict : dict
+        A helper dictionary for gathering results per pipeline
+
+    Methods
+    -------
+    split_tasks_based_on_pipeline()
+        Makes a new dictionary with information about each pipeline
+    select_machine()
+        Returns a VirtualMachine for executing a task
+    execute_task_on_machine(selected_machine, current_task)
+        Executes the currently selected task on the selected machine and returns the task
+    execute()
+        Executes the dumb algorithm
+    return_task_to_the_pipeline_queue()
+        Checks if the task was successfully executed and places it back on the queue when necessary
+    get_results()
+        Gathers results after execution of the algorithm
+    """
+
     def __init__(self, machines: list[VirtualMachine], pipelines: list[Pipeline]):
+        """
+        Constructs a DumbAlgorithm object with a number of machines and pipelines
+        :param machines: List[VirtualMachine]
+        :param pipelines: List[Pipeline]
+        """
         super().__init__(machines, pipelines)
         self.tasks = []
         self.pipeline_dict = dict()
         self.split_tasks_based_on_pipeline()
 
-        self.running_futures = []
-        self.splitted_tasks = split_tasks_based_on_sequential_flow(self.tasks)
-        self.subtask_list = []
-
     def split_tasks_based_on_pipeline(self):
+        """
+        Makes a new helper dictionary with information about each pipeline
+
+        """
         for pipeline in list(sorted(self.pipelines, key=lambda p: p.priority, reverse=True)):
             splitted_tasks = split_tasks_based_on_sequential_flow(pipeline.tasks)
             self.pipeline_dict[f"{pipeline.pipeline_id}"] = {
@@ -44,15 +84,29 @@ class DumbAlgorithm(AbstractAlgorithm):
             self.tasks.extend(pipeline.tasks)
 
     def select_machine(self):
+        """
+        Returns an available VirtualMachine for executing a task
+        :return: VirtualMachine
+        """
         while True:
             available_machines = list(filter(lambda m: m.status == MachineStatus.WAITING, self.machines))
             if len(available_machines) > 0:
                 return available_machines[0]
 
     def execute_task_on_machine(self, selected_machine, current_task):
+        """
+        Executes the currently selected task on the selected machine and returns the task
+        :param selected_machine: VirtualMachine
+        :param current_task: Task
+        :return: Task
+        """
         return selected_machine.execute_task_Dumb(current_task)
 
     def execute(self):
+        """
+        Executes the dumb algorithm by looping over all the pipelines and tasks and executing a task on a virtual machine
+        :return: dict
+        """
         for pipeline_id in self.pipeline_dict.keys():
             selected_pipeline = self.pipeline_dict[str(pipeline_id)]
             while len(selected_pipeline["amount_of_tasks"]) > 0 and not selected_pipeline["finished"]:
@@ -90,6 +144,11 @@ class DumbAlgorithm(AbstractAlgorithm):
         return self.get_results()
 
     def return_task_to_the_pipeline_queue(self, pipeline_id, future):
+        """
+        Checks if the task in the future is fully completed. If not, the task is sent back to the queue of the right pipeline
+        :param pipeline_id: int
+        :param future: Future
+        """
         task = future.result()
         if task.task_duration > 0:
             # Append the task to the right pipeline
@@ -98,6 +157,10 @@ class DumbAlgorithm(AbstractAlgorithm):
             self.pipeline_dict[str(pipeline_id)]["amount_of_tasks"][0] -= 1
 
     def get_results(self):
+        """
+        Collects the results after execution from the pipeline_dict and returns them
+        :return: dict
+        """
         print("\n############################################################\n")
         total_time = time.time() - self.start_time
         result_dict = dict({"pipelines": dict(), "machines": dict(), "total_duration": total_time})
