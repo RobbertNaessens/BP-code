@@ -3,7 +3,7 @@ from MostFitTask import *
 from VirtualMachine import *
 from Task import *
 from Pipeline import *
-from DumbAlgorithm import *
+from SequentialAlgorithm import *
 import csv
 
 """ Algorithm executor
@@ -222,7 +222,7 @@ def execute_Dumb_Algorithm():
     machines = create_VMs()
 
     # region Execution of Dumb Algorithm
-    dumb_algo = DumbAlgorithm(machines, pipelines)
+    dumb_algo = SequentialAlgorithm(machines, pipelines)
     result = dumb_algo.execute()
     with open("Results/results_Dumb.csv", "a", newline="") as f2:
         writer2 = csv.writer(f2)
@@ -271,6 +271,6 @@ if __name__ == '__main__':
     # for i in range(1, 101):
     #     execute_Most_Fit_Task()
 
-    algo = DumbAlgorithm(create_VMs(), create_pipelines())
+    algo = SequentialAlgorithm(create_VMs(), create_pipelines())
     algo.execute()
 

@@ -30,7 +30,7 @@ def split_tasks_based_on_sequential_flow(pipeline_tasks):
     return result
 
 
-class DumbAlgorithm(AbstractAlgorithm):
+class SequentialAlgorithm(AbstractAlgorithm):
     """
     A class that represents a dumb algorithm for scheduling by overwriting the abstract class AbstractAlgorithm.
 

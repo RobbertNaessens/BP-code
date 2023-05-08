@@ -145,22 +145,24 @@ def main():
     file_MFT = "Results/results_MFT.csv"
     file_Dumb = "Results/results_Dumb.csv"
 
-    # Dom algoritme
-    show_individual_results(file_Dumb, "Results dumb algorithm")
+    # # Dom algoritme
+    # show_individual_results(file_Dumb, "Results sequential algorithm")
+    #
+    # # Round Robin algoritmen
+    # show_individual_results(file_RR_worse, "Results execute_RR")
+    # show_individual_results(file_RR, "Results execute_RR_better")
+    # show_all_combined_results([file_RR_worse, file_RR], ["Round Robin Worse", "Round Robin Better"])
+    #
+    # # MFT algoritme
+    # show_individual_results(file_MFT, "Results MFT algorithm")
+    #
+    # # Gecombineerde resultaten
+    # show_all_combined_results([file_Dumb, file_RR, file_MFT], ["Sequential", "Round Robin", "Most Fit Task"])
+    # show_all_combined_results([file_Dumb, file_RR_worse, file_RR, file_MFT],
+    #                           ["Sequential", "Round Robin Worse", "Round Robin Better", "Most Fit Task"])
+    # show_all_combined_results([file_RR, file_MFT], ["Round Robin", "Most Fit Task"])
 
-    # Round Robin algoritmen
-    show_individual_results(file_RR_worse, "Results execute_RR")
-    show_individual_results(file_RR, "Results execute_RR_better")
-    show_all_combined_results([file_RR_worse, file_RR], ["Round Robin Worse", "Round Robin Better"])
-
-    # MFT algoritme
-    show_individual_results(file_MFT, "Results MFT algorithm")
-
-    # Gecombineerde resultaten
-    show_all_combined_results([file_Dumb, file_RR, file_MFT], ["Dumb", "Round Robin", "Most Fit Task"])
-    show_all_combined_results([file_Dumb, file_RR_worse, file_RR, file_MFT],
-                              ["Dumb", "Round Robin Worse", "Round Robin Better", "Most Fit Task"])
-    show_all_combined_results([file_RR, file_MFT], ["Round Robin", "Most Fit Task"])
+    show_all_combined_results([file_Dumb, file_RR_worse, file_RR], ["Sequential algorithm", "Round Robin Worse", "Round Robin Better"])
 
 
 main()
